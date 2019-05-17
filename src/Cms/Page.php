@@ -1122,6 +1122,14 @@ class Page extends ModelWithContent
         if ($html === null) {
             $kirby->data = $this->controller($data, $contentType);
 
+            if ($preview = get('preview')) {
+                $input = json_decode($preview, true);
+                $form = Form::for($this, [
+                    'input' => $input
+                ]);
+                $kirby->data['page']->content()->update($form->data());
+            }
+
             if ($contentType === 'html') {
                 $template = $this->template();
             } else {

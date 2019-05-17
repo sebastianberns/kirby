@@ -2,71 +2,83 @@
   <k-error-view v-if="issue">
     {{ issue.message }}
   </k-error-view>
-  <k-view v-else class="k-page-view">
 
-    <k-header
-      :tabs="tabs"
-      :tab="tab"
-      :editable="permissions.changeTitle"
-      @edit="action('rename')"
-    >
-      {{ page.title }}
-      <k-button-group slot="left">
-        <k-button
-          v-if="permissions.preview && page.previewUrl"
-          :responsive="true"
-          :link="page.previewUrl"
-          target="_blank"
-          icon="open"
-        >
-          {{ $t('open') }}
-        </k-button>
-        <k-button
-          v-if="status"
-          :class="['k-status-flag', 'k-status-flag-' + page.status]"
-          :disabled="permissions.changeStatus === false"
-          :icon="permissions.changeStatus === false ? 'protected' : 'circle'"
-          :responsive="true"
-          @click="action('status')"
-        >
-          {{ status.label }}
-        </k-button>
-        <k-dropdown>
-          <k-button :responsive="true" icon="cog" @click="$refs.settings.toggle()">
-            {{ $t('settings') }}
+  <div v-else class="k-view-wrapper">
+    <k-view class="k-page-view">
+
+      <k-header
+        :tabs="tabs"
+        :tab="tab"
+        :editable="permissions.changeTitle"
+        @edit="action('rename')"
+      >
+        {{ page.title }}
+        <k-button-group slot="left">
+          <k-button
+            v-if="permissions.preview && page.previewUrl"
+            :responsive="true"
+            :link="page.previewUrl"
+            target="_blank"
+            icon="open"
+          >
+            {{ $t('open') }}
           </k-button>
-          <k-dropdown-content ref="settings" :options="options" @action="action" />
-        </k-dropdown>
+          <k-button
+            :responsive="true"
+            icon="preview"
+            @click="preview = !preview"
+          >
+            {{ $t('preview') }}
+          </k-button>
+          <k-button
+            v-if="status"
+            :class="['k-status-flag', 'k-status-flag-' + page.status]"
+            :disabled="permissions.changeStatus === false"
+            :icon="permissions.changeStatus === false ? 'protected' : 'circle'"
+            :responsive="true"
+            @click="action('status')"
+          >
+            {{ status.label }}
+          </k-button>
+          <k-dropdown>
+            <k-button :responsive="true" icon="cog" @click="$refs.settings.toggle()">
+              {{ $t('settings') }}
+            </k-button>
+            <k-dropdown-content ref="settings" :options="options" @action="action" />
+          </k-dropdown>
 
-        <k-languages-dropdown />
+          <k-languages-dropdown />
 
-      </k-button-group>
+        </k-button-group>
 
-      <k-prev-next
+        <k-prev-next
+          v-if="page.id"
+          slot="right"
+          :prev="prev"
+          :next="next"
+        />
+      </k-header>
+
+      <k-tabs
         v-if="page.id"
-        slot="right"
-        :prev="prev"
-        :next="next"
+        ref="tabs"
+        :key="tabsKey"
+        :parent="$api.pages.url(page.id)"
+        :blueprint="blueprint"
+        :tabs="tabs"
+        @tab="tab = $event"
       />
-    </k-header>
 
-    <k-tabs
-      v-if="page.id"
-      ref="tabs"
-      :key="tabsKey"
-      :parent="$api.pages.url(page.id)"
-      :blueprint="blueprint"
-      :tabs="tabs"
-      @tab="tab = $event"
-    />
+      <k-page-rename-dialog ref="rename" @success="update" />
+      <k-page-url-dialog ref="url" />
+      <k-page-status-dialog ref="status" @success="update" />
+      <k-page-template-dialog ref="template" @success="update" />
+      <k-page-remove-dialog ref="remove" />
+    </k-view>
 
-    <k-page-rename-dialog ref="rename" @success="update" />
-    <k-page-url-dialog ref="url" />
-    <k-page-status-dialog ref="status" @success="update" />
-    <k-page-template-dialog ref="template" @success="update" />
-    <k-page-remove-dialog ref="remove" />
+    <k-page-preview v-if="preview" :page="page" />
 
-  </k-view>
+  </div>
 
 </template>
 
@@ -232,5 +244,10 @@ export default {
 }
 .k-status-flag[disabled] {
   opacity: 1;
+}
+
+.k-view-wrapper {
+  display: flex;
+  align-items: stretch;
 }
 </style>
