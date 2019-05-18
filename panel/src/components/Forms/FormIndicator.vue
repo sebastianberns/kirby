@@ -36,14 +36,14 @@ export default {
     models: {
       handler() {
         let promises = this.loadStorage().map(stored => {
-          return this.$api.get(stored.api, { view: "panel" }).then(model => {
+          return this.$api.get(stored.api, { view: "compact" }).then(model => {
             let icon, link;
             if (stored.id.startsWith("pages/")) {
               icon = "page";
               link = this.$api.pages.link(model.id);
             } else if (stored.id.startsWith("files/")) {
               icon = "file-" + model.type;
-              link = this.$api.files.link(this.$api.pages.url(model.parent.id), model.filename);
+              link = model.link;
             } else if (stored.id.startsWith("users/")) {
               icon = "user";
               link = this.$api.users.link(model.id);
