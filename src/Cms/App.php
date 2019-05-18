@@ -57,6 +57,7 @@ class App
     protected $defaultLanguage;
     protected $language;
     protected $languages;
+    protected $locks;
     protected $multilang;
     protected $options;
     protected $path;
@@ -711,7 +712,11 @@ class App
      */
     public function locks(): ContentLocks
     {
-        return new ContentLocks;
+        if ($this->locks !== null) {
+            return $this->locks;
+        }
+
+        return $this->locks = new ContentLocks;
     }
 
     /**
