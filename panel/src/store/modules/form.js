@@ -94,7 +94,11 @@ export default {
 
       localStorage.setItem(
         "kirby$form$" + id,
-        JSON.stringify(state.models[id].values)
+        JSON.stringify({
+          api: state.models[id].api,
+          originals: state.models[id].originals,
+          values: state.models[id].values
+        })
       );
     }
   },
@@ -116,13 +120,13 @@ export default {
       context.commit("CREATE", model);
       context.commit("CURRENT", model.id);
 
-      const values = localStorage.getItem("kirby$form$" + model.id);
+      const stored = localStorage.getItem("kirby$form$" + model.id);
 
-      if (values) {
-        const data = JSON.parse(values);
+      if (stored) {
+        const data = JSON.parse(stored);
 
-        Object.keys(data).forEach(field => {
-          const value = data[field];
+        Object.keys(data.values).forEach(field => {
+          const value = data.values[field];
           context.commit("UPDATE", [model.id, field, value]);
         });
       }
