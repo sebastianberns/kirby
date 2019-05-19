@@ -190,6 +190,7 @@ export default {
         this.$api.pages
           .status(element.id, "listed", position)
           .then(() => {
+            this.$events.$emit("model.update");
             this.$store.dispatch("notification/success", ":)");
           })
           .catch(response => {

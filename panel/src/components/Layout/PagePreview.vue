@@ -84,7 +84,9 @@ export default {
 
 <style lang="scss">
 .k-page-preview {
-  width: 50%;
+  width: 66.6666%;
   background: #fff;
+  border: 0;
+  border-left: 1px solid $color-border;
 }
 </style>

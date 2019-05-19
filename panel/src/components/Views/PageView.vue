@@ -103,7 +103,7 @@ export default {
         status: null
       },
       blueprint: null,
-      preview: true,
+      preview: false,
       permissions: {
         changeTitle: false,
         changeStatus: false
