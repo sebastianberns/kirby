@@ -35,7 +35,19 @@ export default {
   watch: {
     models: {
       handler() {
-        let promises = this.loadStorage().map(stored => {
+        let stored = this.loadStorage();
+
+        // filter removed changes
+        this.changes = this.changes.filter(change => {
+          return stored.map(x => x.id).indexOf(change.id) !== -1;
+        });
+
+        // filter changes that have already been fetched
+        stored = stored.filter(stored => {
+          return this.changes.map(x => x.id).indexOf(stored.id) === -1;
+        });
+
+        let promises = stored.map(stored => {
           return this.$api.get(stored.api, { view: "compact" }).then(model => {
             let icon, link;
             if (stored.id.startsWith("pages/")) {
@@ -59,7 +71,10 @@ export default {
         });
 
         Promise.all(promises).then(models => {
-          this.changes = models;
+          this.changes = [
+            ...this.changes,
+            ...models
+          ];
         });
       },
       deep: true
@@ -74,6 +89,8 @@ export default {
           ...JSON.parse(localStorage.getItem(key)),
           id: key.split("kirby$form$")[1]
         };
+      }).filter(data => {
+        return Object.keys(data.changes).length > 0
       });
     }
   }
