@@ -1,7 +1,6 @@
 <template>
   <iframe
     ref="iframe"
-    :src="page.previewUrl"
     class="k-page-preview"
     name="k-page-preview"
     @load="onLoaded"
@@ -30,10 +29,14 @@ export default {
   watch: {
     changes() {
       this.load();
+    },
+    page() {
+      this.load();
     }
   },
-  created() {
+  mounted() {
     this.canAccess();
+    this.load();
     this.$events.$on("model.update", this.load);
   },
   destroyed() {
