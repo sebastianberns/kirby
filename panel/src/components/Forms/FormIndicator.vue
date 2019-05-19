@@ -35,7 +35,17 @@ export default {
   watch: {
     models: {
       handler() {
-        let stored = this.loadStorage();
+        this.load();
+      },
+      deep: true
+    }
+  },
+  created() {
+    this.load();
+  },
+  methods: {
+    load() {
+      let stored = this.loadStorage();
 
         // filter removed changes
         this.changes = this.changes.filter(change => {
@@ -76,11 +86,7 @@ export default {
             ...models
           ];
         });
-      },
-      deep: true
-    }
-  },
-  methods: {
+    },
     loadStorage() {
       return Object.keys(localStorage)
                    .filter(key => key.startsWith("kirby$form$"))
