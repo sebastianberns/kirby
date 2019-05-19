@@ -15,7 +15,8 @@ export default {
   },
   data() {
     return {
-      scroll: 0,
+      cors: false,
+      scroll: 0
     }
   },
   computed: {
@@ -32,29 +33,50 @@ export default {
     }
   },
   created() {
+    this.canAccess();
     this.$events.$on("model.update", this.load);
   },
   destroyed() {
     this.$events.$off("model.update", this.load);
   },
   methods: {
+    canAccess() {
+      try {
+        const doc = iframe.contentDocument || iframe.contentWindow.document;
+        this.cors = doc.body.innerHTML !== null;
+      } catch(err){
+        this.cors = false
+      }
+    },
     load() {
       if (this.page.previewUrl) {
-        this.scroll = this.$refs.iframe.contentWindow.pageYOffset;
+        // if permitted, store scroll position
+        if (this.cors) {
+          this.scroll = this.$refs.iframe.contentWindow.pageYOffset;
+        }
+
+        // create fake form element
         let form = document.createElement("form");
         form.action = this.page.previewUrl;
         form.target = "k-page-preview";
+
+        // create fake input element with JSOn stringified changes
         let input = document.createElement("input");
         input.type = "hidden";
         input.name = "preview";
         input.value = JSON.stringify(this.changes);
+
+        // submit form to iframe
         form.appendChild(input);
         document.body.appendChild(form);
         form.submit();
       }
     },
     onLoaded() {
-      this.$refs.iframe.contentWindow.scrollTo({top: this.scroll});
+      // if permitted, restore scroll position
+      if (this.cors) {
+        this.$refs.iframe.contentWindow.scrollTo({top: this.scroll});
+      }
     }
   }
 };
